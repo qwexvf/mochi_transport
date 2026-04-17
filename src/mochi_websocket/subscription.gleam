@@ -1,4 +1,4 @@
-// mochi/subscription.gleam
+// mochi_websocket/subscription.gleam
 // GraphQL Subscription support with pub/sub pattern
 //
 // Usage:

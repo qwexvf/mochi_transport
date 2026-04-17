@@ -1,4 +1,4 @@
-// mochi/transport/websocket.gleam
+// mochi_websocket/websocket.gleam
 // WebSocket transport for GraphQL subscriptions using graphql-ws protocol
 //
 // This module implements the graphql-ws protocol (https://github.com/enisdenjo/graphql-ws)

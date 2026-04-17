@@ -1,4 +1,4 @@
-// mochi/subscription_executor.gleam
+// mochi_websocket/subscription_executor.gleam
 // Executes GraphQL subscription operations
 //
 // Subscriptions work differently from queries/mutations:
