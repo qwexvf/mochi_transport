@@ -4,8 +4,10 @@ WebSocket transport and subscriptions for mochi GraphQL (graphql-ws protocol).
 
 ## Installation
 
-```sh
-gleam add mochi_websocket
+```toml
+# gleam.toml
+[dependencies]
+mochi_websocket = { git = "https://github.com/qwexvf/mochi_websocket", ref = "main" }
 ```
 
 ## Usage
@@ -16,7 +18,6 @@ import mochi_websocket/subscription
 
 let pubsub = subscription.new()
 
-// Handle WebSocket upgrade
 websocket.handler(schema, pubsub)
 ```
 
