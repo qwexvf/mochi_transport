@@ -2,7 +2,7 @@ name = "mochi_transport"
 version = "0.1.0"
 description = "WebSocket and SSE transports for mochi GraphQL subscriptions"
 licences = ["Apache-2.0"]
-repository = { type = "github", user = "qwexvf", repo = "mochi" }
+repository = { type = "github", user = "qwexvf", repo = "mochi_transport" }
 
 [dependencies]
 gleam_stdlib = ">= 0.44.0 and < 2.0.0"
