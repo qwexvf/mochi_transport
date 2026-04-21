@@ -263,6 +263,7 @@ pub fn to_field_definition(
     is_deprecated: False,
     deprecation_reason: None,
     topic_fn: topic_fn,
+    rich_resolver: None,
   )
 }
 

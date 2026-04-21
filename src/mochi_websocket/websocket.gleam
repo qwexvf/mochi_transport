@@ -466,6 +466,10 @@ fn encode_execution_errors(errors: List(executor.ExecutionError)) -> Dynamic {
         executor.ResolverError(message: m, path: p, ..) -> #(m, p)
         executor.TypeError(message: m, path: p, ..) -> #(m, p)
         executor.NullValueError(message: m, path: p, ..) -> #(m, p)
+        executor.RichResolverError(graphql_error: e, path: p, ..) -> #(
+          e.message,
+          p,
+        )
       }
       types.to_dynamic(
         dict.from_list([

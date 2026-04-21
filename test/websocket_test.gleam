@@ -332,6 +332,7 @@ pub fn encode_next_test() {
         types.to_dynamic(dict.from_list([#("id", types.to_dynamic("1"))])),
       ),
       errors: [],
+      deferred: [],
     )
   let msg = Next("sub-1", result)
   let json = websocket.encode_server_message(msg)
