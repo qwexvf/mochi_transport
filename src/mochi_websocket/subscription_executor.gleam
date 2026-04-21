@@ -272,20 +272,19 @@ fn execute_subscription_event(
 
   case field.selection_set {
     None -> {
-      // No sub-selection, return event data directly
       executor.ExecutionResult(
         data: Some(make_field(response_name, event_data)),
         errors: [],
+        deferred: [],
       )
     }
     Some(sub_ss) -> {
-      // Execute the selection set on the event data
-      // This requires getting the type and executing
       case get_field_type_name(field_def.field_type) {
         None ->
           executor.ExecutionResult(
             data: Some(make_field(response_name, event_data)),
             errors: [],
+            deferred: [],
           )
         Some(type_name) -> {
           case dict.get(context.schema.types, type_name) {
@@ -302,6 +301,7 @@ fn execute_subscription_event(
               executor.ExecutionResult(
                 data: Some(make_field(response_name, event_data)),
                 errors: [],
+                deferred: [],
               )
           }
         }
@@ -345,12 +345,14 @@ fn execute_selection_on_event(
       executor.ExecutionResult(
         data: Some(make_field(response_name, types.to_dynamic(dict.new()))),
         errors: errors,
+        deferred: [],
       )
     _ -> {
       let merged = merge_field_results(data_parts)
       executor.ExecutionResult(
         data: Some(make_field(response_name, merged)),
         errors: errors,
+        deferred: [],
       )
     }
   }
@@ -369,19 +371,23 @@ fn execute_event_field(
       executor.ExecutionResult(
         data: Some(make_field(response_name, types.to_dynamic(object_type.name))),
         errors: [],
+        deferred: [],
       )
     _ -> {
       case dict.get(object_type.fields, field.name) {
         Error(_) ->
-          executor.ExecutionResult(data: None, errors: [
-            executor.ValidationError(
-              "Field '" <> field.name <> "' not found",
-              [],
-              location: None,
-            ),
-          ])
+          executor.ExecutionResult(
+            data: None,
+            errors: [
+              executor.ValidationError(
+                "Field '" <> field.name <> "' not found",
+                [],
+                location: None,
+              ),
+            ],
+            deferred: [],
+          )
         Ok(field_def) -> {
-          // Try to resolve from event data or use resolver
           case field_def.resolver {
             Some(resolver) -> {
               let resolver_info =
@@ -399,19 +405,28 @@ fn execute_event_field(
                   executor.ExecutionResult(
                     data: Some(make_field(response_name, value)),
                     errors: [],
+                    deferred: [],
                   )
                 Error(msg) ->
-                  executor.ExecutionResult(data: None, errors: [
-                    executor.ResolverError(msg, [response_name], location: None),
-                  ])
+                  executor.ExecutionResult(
+                    data: None,
+                    errors: [
+                      executor.ResolverError(
+                        msg,
+                        [response_name],
+                        location: None,
+                      ),
+                    ],
+                    deferred: [],
+                  )
               }
             }
             None -> {
-              // Try to extract field from event data
               let value = extract_field_from_dynamic(event_data, field.name)
               executor.ExecutionResult(
                 data: Some(make_field(response_name, value)),
                 errors: [],
+                deferred: [],
               )
             }
           }

@@ -220,13 +220,13 @@ pub fn topic_helpers_test() {
 pub fn subscription_definition_test() {
   let on_user_created =
     query.subscription(
-      "onUserCreated",
-      schema.named_type("User"),
-      "user:created",
-      user_to_dynamic,
+      name: "onUserCreated",
+      returns: schema.named_type("User"),
+      topic: "user:created",
     )
+    |> query.with_encoder(user_to_dynamic)
 
-  case on_user_created.name == "onUserCreated" {
+  case query.get_name(on_user_created) == "onUserCreated" {
     True -> Nil
     False -> panic as "Subscription name should be 'onUserCreated'"
   }
@@ -235,14 +235,14 @@ pub fn subscription_definition_test() {
 pub fn subscription_with_description_test() {
   let on_user_created =
     query.subscription(
-      "onUserCreated",
-      schema.named_type("User"),
-      "user:created",
-      user_to_dynamic,
+      name: "onUserCreated",
+      returns: schema.named_type("User"),
+      topic: "user:created",
     )
-    |> query.subscription_description("Triggered when a new user is created")
+    |> query.with_encoder(user_to_dynamic)
+    |> query.with_description("Triggered when a new user is created")
 
-  case on_user_created.description {
+  case query.get_description(on_user_created) {
     Some("Triggered when a new user is created") -> Nil
     _ -> panic as "Description should be set"
   }
@@ -251,20 +251,19 @@ pub fn subscription_with_description_test() {
 pub fn subscription_with_args_test() {
   let on_message =
     query.subscription_with_args(
-      "onMessageSent",
-      [query.arg("roomId", schema.non_null(schema.id_type()))],
-      schema.named_type("Message"),
-      fn(args) {
-        case dict.get(args, "roomId") {
-          Ok(_) -> Ok("room_id_here")
-          Error(_) -> Error("Missing roomId")
+      name: "onMessageSent",
+      args: [query.arg("roomId", schema.non_null(schema.id_type()))],
+      returns: schema.named_type("Message"),
+      topic: fn(args, _ctx) {
+        case query.get_string(args, "roomId") {
+          Ok(id) -> Ok("messages:" <> id)
+          Error(e) -> Error(e)
         }
       },
-      fn(room_id, _ctx) { Ok("messages:" <> room_id) },
-      message_to_dynamic,
     )
+    |> query.with_encoder(message_to_dynamic)
 
-  case on_message.name == "onMessageSent" {
+  case query.get_name(on_message) == "onMessageSent" {
     True -> Nil
     False -> panic as "Subscription name should be 'onMessageSent'"
   }
@@ -283,19 +282,18 @@ pub fn schema_with_subscription_test() {
 
   let users_query =
     query.query(
-      "users",
-      schema.list_type(schema.named_type("User")),
-      fn(_ctx) { Ok([]) },
-      fn(_) { types.to_dynamic([]) },
+      name: "users",
+      returns: schema.list_type(schema.named_type("User")),
+      resolve: fn(_ctx) { Ok([]) },
     )
 
   let on_user_created =
     query.subscription(
-      "onUserCreated",
-      schema.named_type("User"),
-      "user:created",
-      user_to_dynamic,
+      name: "onUserCreated",
+      returns: schema.named_type("User"),
+      topic: "user:created",
     )
+    |> query.with_encoder(user_to_dynamic)
 
   let test_schema =
     query.new()
@@ -323,35 +321,32 @@ pub fn schema_with_subscription_test() {
 pub fn schema_multiple_subscriptions_test() {
   let on_user_created =
     query.subscription(
-      "onUserCreated",
-      schema.named_type("User"),
-      "user:created",
-      user_to_dynamic,
+      name: "onUserCreated",
+      returns: schema.named_type("User"),
+      topic: "user:created",
     )
+    |> query.with_encoder(user_to_dynamic)
 
   let on_user_updated =
     query.subscription(
-      "onUserUpdated",
-      schema.named_type("User"),
-      "user:updated",
-      user_to_dynamic,
+      name: "onUserUpdated",
+      returns: schema.named_type("User"),
+      topic: "user:updated",
     )
+    |> query.with_encoder(user_to_dynamic)
 
   let on_message =
     query.subscription(
-      "onMessageSent",
-      schema.named_type("Message"),
-      "message:sent",
-      message_to_dynamic,
+      name: "onMessageSent",
+      returns: schema.named_type("Message"),
+      topic: "message:sent",
     )
+    |> query.with_encoder(message_to_dynamic)
 
   let dummy_query =
-    query.query(
-      "dummy",
-      schema.string_type(),
-      fn(_) { Ok("dummy") },
-      types.to_dynamic,
-    )
+    query.query(name: "dummy", returns: schema.string_type(), resolve: fn(_) {
+      Ok("dummy")
+    })
 
   let test_schema =
     query.new()
@@ -384,20 +379,17 @@ pub fn subscription_executor_basic_test() {
     |> types.build(fn(_) { Ok(User("1", "Test", "test@example.com")) })
 
   let dummy_query =
-    query.query(
-      "dummy",
-      schema.string_type(),
-      fn(_) { Ok("dummy") },
-      types.to_dynamic,
-    )
+    query.query(name: "dummy", returns: schema.string_type(), resolve: fn(_) {
+      Ok("dummy")
+    })
 
   let on_user_created =
     query.subscription(
-      "onUserCreated",
-      schema.named_type("User"),
-      "user:created",
-      user_to_dynamic,
+      name: "onUserCreated",
+      returns: schema.named_type("User"),
+      topic: "user:created",
     )
+    |> query.with_encoder(user_to_dynamic)
 
   let test_schema =
     query.new()
@@ -447,12 +439,9 @@ pub fn subscription_executor_basic_test() {
 pub fn subscription_executor_no_subscription_type_test() {
   // Schema without subscription type
   let dummy_query =
-    query.query(
-      "dummy",
-      schema.string_type(),
-      fn(_) { Ok("dummy") },
-      types.to_dynamic,
-    )
+    query.query(name: "dummy", returns: schema.string_type(), resolve: fn(_) {
+      Ok("dummy")
+    })
 
   let test_schema =
     query.new()
@@ -486,20 +475,17 @@ pub fn subscription_executor_no_subscription_type_test() {
 
 pub fn subscription_executor_invalid_field_test() {
   let dummy_query =
-    query.query(
-      "dummy",
-      schema.string_type(),
-      fn(_) { Ok("dummy") },
-      types.to_dynamic,
-    )
+    query.query(name: "dummy", returns: schema.string_type(), resolve: fn(_) {
+      Ok("dummy")
+    })
 
   let on_user_created =
     query.subscription(
-      "onUserCreated",
-      schema.named_type("User"),
-      "user:created",
-      user_to_dynamic,
+      name: "onUserCreated",
+      returns: schema.named_type("User"),
+      topic: "user:created",
     )
+    |> query.with_encoder(user_to_dynamic)
 
   let test_schema =
     query.new()
@@ -534,20 +520,17 @@ pub fn subscription_executor_invalid_field_test() {
 
 pub fn subscription_unsubscribe_test() {
   let dummy_query =
-    query.query(
-      "dummy",
-      schema.string_type(),
-      fn(_) { Ok("dummy") },
-      types.to_dynamic,
-    )
+    query.query(name: "dummy", returns: schema.string_type(), resolve: fn(_) {
+      Ok("dummy")
+    })
 
   let on_user_created =
     query.subscription(
-      "onUserCreated",
-      schema.named_type("User"),
-      "user:created",
-      user_to_dynamic,
+      name: "onUserCreated",
+      returns: schema.named_type("User"),
+      topic: "user:created",
     )
+    |> query.with_encoder(user_to_dynamic)
 
   let test_schema =
     query.new()
