@@ -24,8 +24,8 @@ import mochi/executor.{type ExecutionResult}
 import mochi/json
 import mochi/schema.{type Schema}
 import mochi/types
-import mochi_websocket/subscription.{type PubSub, type SubscriptionId}
-import mochi_websocket/subscription_executor
+import mochi_transport/subscription.{type PubSub, type SubscriptionId}
+import mochi_transport/subscription_executor
 
 // ============================================================================
 // Protocol Types - Client Messages

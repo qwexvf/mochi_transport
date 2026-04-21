@@ -19,7 +19,7 @@ import mochi/executor.{type ExecutionResult}
 import mochi/parser
 import mochi/schema
 import mochi/types
-import mochi_websocket/subscription.{
+import mochi_transport/subscription.{
   type PubSub, type SubscriptionId, type Topic,
 }
 

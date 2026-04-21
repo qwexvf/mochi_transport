@@ -6,8 +6,8 @@ import gleam/option.{None, Some}
 import mochi/query
 import mochi/schema
 import mochi/types
-import mochi_websocket/subscription
-import mochi_websocket/subscription_executor
+import mochi_transport/subscription
+import mochi_transport/subscription_executor
 
 // ============================================================================
 // Test Types

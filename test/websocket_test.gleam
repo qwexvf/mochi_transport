@@ -5,8 +5,8 @@ import gleeunit/should
 import mochi/executor
 import mochi/schema
 import mochi/types
-import mochi_websocket/subscription
-import mochi_websocket/websocket.{
+import mochi_transport/subscription
+import mochi_transport/websocket.{
   Complete, ConnectionAck, ConnectionInit, HandleClose, HandleOk, Next, Ping,
   Pong, ServerComplete, ServerPong, Subscribe, SubscriptionPayload,
 }

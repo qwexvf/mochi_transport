@@ -1,29 +1,7 @@
-//// WebSocket transport and subscriptions for mochi GraphQL.
-////
-//// Implements the graphql-ws protocol for real-time subscriptions.
-////
-//// ## Usage
-////
-//// ```gleam
-//// import mochi_websocket
-//// import mochi_websocket/subscription
-//// import mochi_websocket/websocket
-////
-//// // Create pub/sub and connection state
-//// let pubsub = mochi_websocket.new_pubsub()
-//// let state = mochi_websocket.new_connection(schema, pubsub)
-////
-//// // In your WebSocket message handler:
-//// let #(new_state, messages) = mochi_websocket.handle_message(state, raw_msg)
-////
-//// // Publish events from outside:
-//// mochi_websocket.publish(pubsub, "user:created", event_data)
-//// ```
-
 import gleam/dynamic.{type Dynamic}
 import mochi/schema.{type ExecutionContext, type Schema}
-import mochi_websocket/subscription.{type PubSub, type Topic}
-import mochi_websocket/websocket.{
+import mochi_transport/subscription.{type PubSub, type Topic}
+import mochi_transport/websocket.{
   type ClientMessage, type ConnectionState, type HandleResult,
 }
 
