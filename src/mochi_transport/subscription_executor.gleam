@@ -15,8 +15,8 @@ import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/result
 import mochi/args as args_mod
-import mochi/internal/ast
 import mochi/executor.{type ExecutionResult}
+import mochi/internal/ast
 import mochi/parser
 import mochi/schema
 import mochi/types
