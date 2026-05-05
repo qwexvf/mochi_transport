@@ -1,32 +1,38 @@
-> **Active development** — breaking changes may be pushed to `main` at any time.
+# mochi_transport
 
+WebSocket and Server-Sent Events transports for
+[mochi](https://github.com/qwexvf/mochi) GraphQL subscriptions.
 
-# mochi_websocket
-
-WebSocket transport and subscriptions for mochi GraphQL (graphql-ws protocol).
+- WebSocket: [graphql-ws](https://github.com/enisdenjo/graphql-ws) protocol
+- SSE: [GraphQL over SSE](https://github.com/enisdenjo/graphql-sse) protocol
 
 ## Installation
 
-```toml
-# gleam.toml
-[dependencies]
-mochi_websocket = { git = "https://github.com/qwexvf/mochi_websocket", ref = "main" }
+```sh
+gleam add mochi_transport
 ```
 
 ## Usage
 
+WebSocket subscriptions:
+
 ```gleam
-import mochi_websocket/websocket
-import mochi_websocket/subscription
+import mochi_transport/subscription
+import mochi_transport/websocket
 
 let pubsub = subscription.new()
 
 websocket.handler(schema, pubsub)
 ```
 
+Server-Sent Events:
+
+```gleam
+import mochi_transport/sse
+
+sse.handler(schema, pubsub)
+```
+
 ## License
 
 Apache-2.0
-
----
-Built with the help of [Claude Code](https://claude.ai/code).

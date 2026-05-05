@@ -399,11 +399,16 @@ pub fn client_message_type(message: ClientMessage) -> String {
 // JSON Encoding - Server Messages
 // ============================================================================
 
-/// Encode a server message to JSON string
+/// Encode a server message to JSON string. Falls back to a minimal
+/// graphql-ws error frame if encoding fails for any reason.
 pub fn encode_server_message(message: ServerMessage) -> String {
-  message
-  |> server_message_to_dynamic
-  |> json.encode
+  case json.encode(server_message_to_dynamic(message)) {
+    Ok(s) -> s
+    Error(err) ->
+      "{\"type\":\"error\",\"payload\":[{\"message\":\"Internal: "
+      <> json.describe_error(err)
+      <> "\"}]}"
+  }
 }
 
 /// Convert a server message to Dynamic for JSON encoding
