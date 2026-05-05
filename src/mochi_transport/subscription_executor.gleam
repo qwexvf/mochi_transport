@@ -14,7 +14,8 @@ import gleam/dynamic/decode
 import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/result
-import mochi/ast
+import mochi/args as args_mod
+import mochi/internal/ast
 import mochi/executor.{type ExecutionResult}
 import mochi/parser
 import mochi/schema
@@ -133,7 +134,7 @@ fn execute_subscription(
   // Use topic_fn if available (set by subscription_to_field_def), else fall back to field name
   let topic = case field_def.topic_fn {
     Some(topic_fn) ->
-      case topic_fn(args, context.execution_context) {
+      case topic_fn(args_mod.from_dict(args), context.execution_context) {
         Ok(t) -> t
         Error(_) -> field.name
       }
@@ -390,13 +391,13 @@ fn execute_event_field(
         Ok(field_def) -> {
           case field_def.resolver {
             Some(resolver) -> {
+              let coerced =
+                coerce_arguments(field.arguments, context.variable_values)
               let resolver_info =
                 schema.ResolverInfo(
                   parent: Some(event_data),
-                  arguments: coerce_arguments(
-                    field.arguments,
-                    context.variable_values,
-                  ),
+                  arguments: coerced,
+                  args: args_mod.from_dict(coerced),
                   context: context.execution_context,
                   info: types.to_dynamic(dict.new()),
                 )

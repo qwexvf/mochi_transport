@@ -24,7 +24,7 @@ pub fn error_frame(message: String) -> BitArray {
   let err =
     types.to_dynamic(dict.from_list([#("message", types.to_dynamic(message))]))
   let payload =
-    json.encode(
+    safe_encode(
       types.to_dynamic(
         dict.from_list([
           #("data", types.to_dynamic(Nil)),
@@ -46,9 +46,9 @@ pub fn cache_control() -> String {
 fn encode_result(result: ExecutionResult) -> String {
   case result.data, result.errors {
     Some(data), [] ->
-      json.encode(types.to_dynamic(dict.from_list([#("data", data)])))
+      safe_encode(types.to_dynamic(dict.from_list([#("data", data)])))
     Some(data), errs ->
-      json.encode(
+      safe_encode(
         types.to_dynamic(
           dict.from_list([
             #("data", data),
@@ -57,7 +57,7 @@ fn encode_result(result: ExecutionResult) -> String {
         ),
       )
     None, errs ->
-      json.encode(
+      safe_encode(
         types.to_dynamic(
           dict.from_list([
             #("data", types.to_dynamic(Nil)),
@@ -65,6 +65,16 @@ fn encode_result(result: ExecutionResult) -> String {
           ]),
         ),
       )
+  }
+}
+
+fn safe_encode(value: Dynamic) -> String {
+  case json.encode(value) {
+    Ok(s) -> s
+    Error(err) ->
+      "{\"data\":null,\"errors\":[{\"message\":\"Internal: "
+      <> json.describe_error(err)
+      <> "\"}]}"
   }
 }
 
