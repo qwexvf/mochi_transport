@@ -266,6 +266,7 @@ pub fn to_field_definition(
     deprecation_reason: None,
     topic_fn: topic_fn,
     rich_resolver: None,
+    columns: schema.DerivedColumn,
   )
 }
 
