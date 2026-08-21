@@ -614,7 +614,10 @@ fn get_field(dyn: Dynamic, field: String) -> Result(Dynamic, DecodeError) {
   |> result.map_error(fn(_) { MissingField(field) })
 }
 
-fn get_string_field(dyn: Dynamic, field: String) -> Result(String, DecodeError) {
+fn get_string_field(
+  dyn: Dynamic,
+  field: String,
+) -> Result(String, DecodeError) {
   // First check if field exists
   case decode.run(dyn, decode.at([field], decode.dynamic)) {
     Error(_) -> Error(MissingField(field))

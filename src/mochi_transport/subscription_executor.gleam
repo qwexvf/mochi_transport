@@ -103,7 +103,9 @@ pub fn publish_event(
 // Internal Implementation
 // ============================================================================
 
-fn find_subscription_operation(document: ast.Document) -> Option(ast.Operation) {
+fn find_subscription_operation(
+  document: ast.Document,
+) -> Option(ast.Operation) {
   document.definitions
   |> list.find_map(fn(def) {
     case def {
